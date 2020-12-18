@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:smart_ekyc/features/login/login_screen.dart';
-import 'package:smart_ekyc/features/upload-images/upload-identity-card-screen.dart';
 
 void main() => runApp(MyApp());
 
@@ -26,7 +25,7 @@ class _MainState extends State<Main> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: UploadIdentityCardScreen(),
+      body: LoginScreen(),
     );
   }
 }
