@@ -17,7 +17,6 @@ class _UserInfoItem extends State<UserInfoItem> {
 
   @override
   void initState() {
-    // TODO: implement initState
     valueController.text = widget.value;
     super.initState();
   }

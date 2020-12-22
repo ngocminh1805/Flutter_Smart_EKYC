@@ -1,19 +1,25 @@
 import 'dart:developer';
-
+import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:smart_ekyc/features/upload-images/components/image-preview.dart';
 import 'package:smart_ekyc/features/upload-images/components/user-info-item.dart';
 
 class FinishScreen extends StatefulWidget {
+  final String path1;
+  final String path2;
+  final String path3;
+
+  FinishScreen({this.path1, this.path2, this.path3});
+
   @override
   _FinishSceen createState() => _FinishSceen();
 }
 
 class _FinishSceen extends State<FinishScreen> {
-  List<UserInfo> data = [];
+  List data = [];
 
   @override
   void initState() {
-    // TODO: implement initState
     data.add(UserInfo('Loại thẻ', 'GIẤY CHỨNG MINH NHÂN DÂN'));
     data.add(UserInfo('Chứng minh nhân dân số', '174635352'));
     data.add(UserInfo('Họ và tên', 'NGUYỄN NGỌC MINH'));
@@ -24,10 +30,19 @@ class _FinishSceen extends State<FinishScreen> {
     data.add(UserInfo('Ngày cấp', '06/11/2015'));
     data.add(UserInfo('Có giá trị đến', ''));
     data.add(UserInfo('Dân tộc/Quốc tịch', 'Kinh'));
+    data.add(widget.path1);
+    data.add(widget.path2);
 
     log('size of data: ${data.length}');
-
     super.initState();
+  }
+
+  Widget items(item) {
+    if (item.runtimeType == UserInfo) {
+      return UserInfoItem(label: item.label, value: item.value);
+    } else {
+      return ImagePreview(path: item);
+    }
   }
 
   @override
@@ -38,23 +53,29 @@ class _FinishSceen extends State<FinishScreen> {
         children: <Widget>[
           Container(
             alignment: Alignment.center,
-            padding: EdgeInsets.only(top: 40),
+            padding: EdgeInsets.only(top: 40, bottom: 10),
+            decoration: BoxDecoration(border: Border.all(width: 1)),
             child: Column(
               children: <Widget>[
                 Container(
                   padding: EdgeInsets.only(bottom: 20),
                   child: CircleAvatar(
-                    backgroundImage: AssetImage('assets/image.png'),
+                    backgroundImage: FileImage(File(widget.path3)),
                     radius: 75,
                   ),
                 ),
-                Text("mặt chụp và CMT không trùng nhau")
+                Text(
+                  "mặt chụp và CMT trùng nhau",
+                  style: TextStyle(color: Colors.green),
+                )
               ],
             ),
           ),
           Container(
             width: MediaQuery.of(context).size.width,
             padding: EdgeInsets.only(right: 20, left: 20),
+            decoration:
+                BoxDecoration(border: Border(bottom: BorderSide(width: 1))),
             // color: Colors.blueGrey,
             child: FlatButton(
               onPressed: () => onReCapture(),
@@ -74,14 +95,11 @@ class _FinishSceen extends State<FinishScreen> {
           Expanded(
             child: ListView.builder(
               itemBuilder: (context, index) {
-                return UserInfoItem(
-                    label: data[index].label, value: data[index].value);
-                // return UserInfoItem(label: 'Label', value: 'MINH BE TI');
+                return items(data[index]);
               },
               itemCount: data.length,
             ),
-          )
-          // Container(child: BodyList())
+          ),
         ],
       )),
     );
