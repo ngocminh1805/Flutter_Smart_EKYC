@@ -20,17 +20,18 @@ class _UploadIdentityCardScreen extends State<UploadIdentityCardScreen> {
   var base = Base();
   CameraController controller;
   List cameras;
-  int selectedCameraIdx; // choose front camera ar back camera
-  int step = 0;
+  int selectedCameraIdx; // choose front camera or back camera
+  int step =
+      0; // step capture picture (0: chụp mặt trước, 1: chụp mặt sau, 2: chụp khuôn mặt )
   String imagePath1; // front identitycard
   String imagePath2; // back indentitycard
   String imagePath3; // face image 1
   String imagePath4; // face image 2
   String imagePath5; // face image 3
-  bool preview = false;
-  String token;
-  bool check_ocr = false;
-  double process_value = 0.1;
+  bool preview = false; // preview ảnh sau khi chụp
+  String token; // user token
+  String ocr_messages; // messages được ocr trả về
+  double process_value = 0.1; // giá trị của process bar chụp ảnh khuôn mặt
 
   @override
   void initState() {
@@ -55,7 +56,7 @@ class _UploadIdentityCardScreen extends State<UploadIdentityCardScreen> {
   }
 //
 
-// -------------------  -----------------------------------------
+// ------------------- khởi tạo camere controller -----------------------------------------
   Future _initCameraController(CameraDescription cameraDescription) async {
     if (controller != null) {
       await controller.dispose();
@@ -89,7 +90,7 @@ class _UploadIdentityCardScreen extends State<UploadIdentityCardScreen> {
     }
   }
 
-  ///-------------------------------- render main screen -----------------------------------------------
+  ///---------- render main screen - hiển thị camera hoặc chế độ preview ảnh sau khi chụp -----------------------------------------------
   Widget renderMainScreen() {
     if (preview && step == 0) {
       return previewImage(imagePath1);
@@ -105,7 +106,7 @@ class _UploadIdentityCardScreen extends State<UploadIdentityCardScreen> {
     }
   }
 
-  //--------------------------- camera widget -------------------------------------------------
+  //--------------------------- camera widget - hiển thị camera -------------------------------------------------
   Widget _cameraPreviewWidget() {
     if (controller == null || !controller.value.isInitialized) {
       return Container(
@@ -120,7 +121,7 @@ class _UploadIdentityCardScreen extends State<UploadIdentityCardScreen> {
     );
   }
 
-  //----------------------------- render preview screen ----------------------
+  //--------------- render preview screen - preview ảnh sau khi chụp  ----------------------
   Widget previewImage(String path) {
     return Container(
       child: Image(
@@ -129,7 +130,7 @@ class _UploadIdentityCardScreen extends State<UploadIdentityCardScreen> {
     );
   }
 
-  // -------------------------- render title ------------------------------
+  // ------------- render title - title của thanh toolbar ------------------------------
 
   String title() {
     if (!preview && step == 0) {
@@ -145,7 +146,7 @@ class _UploadIdentityCardScreen extends State<UploadIdentityCardScreen> {
     }
   }
 
-  // ---------------- render button ctn -----------------------------
+  // ------------ render button ctn - hiển thị các nút bấm theo từng step  -----------------------------
   Widget buttonConatiner() {
     if (preview) {
       return Container(
@@ -227,7 +228,7 @@ class _UploadIdentityCardScreen extends State<UploadIdentityCardScreen> {
     }
   }
 
-  // ----------------------- render sq ------------------------------
+  // --------- render sq - khung ảnh nằm phía trên camera để định vị vị trí thẻ và khuôn mặt  ------------------------------
 
   Widget _sq() {
     if (controller == null || !controller.value.isInitialized) {
@@ -283,7 +284,7 @@ class _UploadIdentityCardScreen extends State<UploadIdentityCardScreen> {
     );
   }
 
-  // ------------------- capture image --------------------------------
+  // ----------- capture image - hàm chụp ảnh trả về đường dẫn ảnh  --------------------------------
 
   Future<String> capture() async {
     try {
@@ -299,7 +300,7 @@ class _UploadIdentityCardScreen extends State<UploadIdentityCardScreen> {
     return '';
   }
 
-  // ------------------- on press capture -----------------------
+  // ----------- on press capture - chụp ảnh CMT bằng btn  -----------------------
   void onCapturePressed() async {
     capture().then((path) => {
           if (step == 0)
@@ -319,7 +320,7 @@ class _UploadIdentityCardScreen extends State<UploadIdentityCardScreen> {
         });
   }
 
-//--------------------- switch camera -----------------------------
+//------------- switch camera - hàm đổi chiều camera -----------------------------
   void onSwitchCamera() {
     selectedCameraIdx =
         selectedCameraIdx < cameras.length - 1 ? selectedCameraIdx + 1 : 0;
@@ -327,7 +328,7 @@ class _UploadIdentityCardScreen extends State<UploadIdentityCardScreen> {
     _initCameraController(selectedCamera);
   }
 
-  // ---------------- comfirm  --------------------
+  // ----------- comfirm - preview ảnh CMT ok   --------------------
   void onConfirm() {
     if (step == 1) {
       onSwitchCamera();
@@ -343,14 +344,14 @@ class _UploadIdentityCardScreen extends State<UploadIdentityCardScreen> {
     });
   }
 
-  // ---------------- reCapture --------------------
+  // ------------ reCapture - chụp lại ảnh CMT --------------------
   void onReCapture() {
     setState(() {
       preview = false;
     });
   }
 
-  // --------------- check face ---------------------
+  // ------------ check face - hàm gọi ocr và chụp 3 ảnh  khuôn mặt (sau khi ocr thực hiện xong sẽ tiến hành chụp ảnh khuôn mặt)
   void checkFace() {
     ocr().then((value) => null).whenComplete(() => {
           log('............... Check Face ........................'),
@@ -405,7 +406,7 @@ class _UploadIdentityCardScreen extends State<UploadIdentityCardScreen> {
         });
   }
 
-  // --------------- OCR ----------------------------
+  // --------------- OCR - hàm gọi API OCR để lấy thông tin giấy tờ ----------------------------
   Future ocr() async {
     String token;
     final prefs = await SharedPreferences.getInstance();
@@ -414,13 +415,15 @@ class _UploadIdentityCardScreen extends State<UploadIdentityCardScreen> {
     // ignore: non_constant_identifier_names
     var URL = base.URL_OCR;
     var req = new http.MultipartRequest("POST", Uri.parse(URL));
-    Map<String, String> headers = {"Authorization": "Bear " + token};
-    // open a bytestream
 
+    // ------ tạo header cho api -----------
+    Map<String, String> headers = {"Authorization": "Bear " + token};
+
+    // ---- truyền file ảnh vào params của Api-------------------
     req.files.add(await http.MultipartFile.fromPath('IdCardFront', imagePath1));
     req.files.add(await http.MultipartFile.fromPath('IdCardBack', imagePath2));
     req.headers.addAll(headers);
-
+    //-------------- gọi api -------------------------------
     var res = await req.send();
     res.stream.transform(utf8.decoder).listen((response) async {
       log("RESPONSE_OCR :" + response);
@@ -444,6 +447,11 @@ class _UploadIdentityCardScreen extends State<UploadIdentityCardScreen> {
       prefs.setString(
           'identCardExpireDate', data['identCardExpireDate'].toString());
       prefs.setString('guid', data['guid']);
+
+      var message = parsed['data']['messages '];
+      setState(() {
+        ocr_messages = message;
+      });
 
       log('LOAI THE' + data['identCardType'].toString());
     });

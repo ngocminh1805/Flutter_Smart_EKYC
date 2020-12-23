@@ -21,6 +21,7 @@ class _LoginScreenState extends State<LoginScreen> {
             //--------------- Form input  ---------------------
             FormInput(),
 
+            // ------------ bottom text -------------------------
             Text(
               "Copyright © 2020 Smart eKYC. Designed by Hyperlogy.",
               style: TextStyle(color: Colors.blueGrey),
