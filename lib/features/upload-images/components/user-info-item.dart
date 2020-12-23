@@ -31,12 +31,12 @@ class _UserInfoItem extends State<UserInfoItem> {
           children: <Widget>[
             Text(
               widget.label ?? 'null',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
             ),
             Container(
               height: 35,
               child: TextField(
-                style: TextStyle(fontSize: 18),
+                style: TextStyle(fontSize: 16),
                 decoration: InputDecoration(
                   border: OutlineInputBorder(
                     borderSide: BorderSide(color: Colors.black),

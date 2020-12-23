@@ -1,15 +1,22 @@
+import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:smart_ekyc/api/base.dart';
 import 'package:smart_ekyc/features/upload-images/components/image-preview.dart';
 import 'package:smart_ekyc/features/upload-images/components/user-info-item.dart';
+import 'package:http/http.dart' as http;
+import 'package:smart_ekyc/features/upload-images/upload-identity-card-screen.dart';
 
 class FinishScreen extends StatefulWidget {
   final String path1;
   final String path2;
   final String path3;
+  final String path4;
+  final String path5;
 
-  FinishScreen({this.path1, this.path2, this.path3});
+  FinishScreen({this.path1, this.path2, this.path3, this.path4, this.path5});
 
   @override
   _FinishSceen createState() => _FinishSceen();
@@ -17,23 +24,17 @@ class FinishScreen extends StatefulWidget {
 
 class _FinishSceen extends State<FinishScreen> {
   List data = [];
+  bool isloading = true;
+  var base = Base();
+  String message = 'Đang so sánh khuôn mặt';
+  bool result;
+  bool compareFace = true;
 
   @override
   void initState() {
-    data.add(UserInfo('Loại thẻ', 'GIẤY CHỨNG MINH NHÂN DÂN'));
-    data.add(UserInfo('Chứng minh nhân dân số', '174635352'));
-    data.add(UserInfo('Họ và tên', 'NGUYỄN NGỌC MINH'));
-    data.add(UserInfo('Ngày,tháng,năm,sinh', '18/05/1999'));
-    data.add(UserInfo('Quê quán', 'xã Đại Lộc, Hậu Lộc, Thanh Hóa'));
-    data.add(UserInfo('Địa chỉ thường chú', 'xã Đại Lộc, Hậu Lộc, Thanh Hóa'));
-    data.add(UserInfo('Giới tính', ''));
-    data.add(UserInfo('Ngày cấp', '06/11/2015'));
-    data.add(UserInfo('Có giá trị đến', ''));
-    data.add(UserInfo('Dân tộc/Quốc tịch', 'Kinh'));
-    data.add(widget.path1);
-    data.add(widget.path2);
-
-    log('size of data: ${data.length}');
+    getData();
+    faceVerify();
+    // log('size of data: ${data.length}');
     super.initState();
   }
 
@@ -44,6 +45,46 @@ class _FinishSceen extends State<FinishScreen> {
       return ImagePreview(path: item);
     }
   }
+
+// ------------------------- loading --------------------------------------
+  Widget loading() {
+    return Expanded(
+        child: Container(
+      alignment: Alignment.center,
+      child: CircularProgressIndicator(),
+    ));
+  }
+
+// ------------------------- render main ------------------------------------
+  Widget renderMain() {
+    if (isloading) {
+      return loading();
+    } else {
+      return Expanded(
+        child: ListView.builder(
+          itemBuilder: (context, index) {
+            return items(data[index]);
+          },
+          itemCount: data.length,
+        ),
+      );
+    }
+  }
+
+  Widget renderMess() {
+    if (compareFace) {
+      return Text('Đang so sánh khuôn mặt ...',
+          style: TextStyle(color: Colors.orange));
+    } else if (result) {
+      return Text('Khuôn mặt và CMT trùng nhau',
+          style: TextStyle(color: Colors.green));
+    } else {
+      return Text('Khuôn mặt và CMT không trùng nhau',
+          style: TextStyle(color: Colors.red));
+    }
+  }
+
+  // ------------------------ main info ------------------------------------
 
   @override
   Widget build(BuildContext context) {
@@ -64,10 +105,7 @@ class _FinishSceen extends State<FinishScreen> {
                     radius: 75,
                   ),
                 ),
-                Text(
-                  "mặt chụp và CMT trùng nhau",
-                  style: TextStyle(color: Colors.green),
-                )
+                renderMess()
               ],
             ),
           ),
@@ -80,7 +118,7 @@ class _FinishSceen extends State<FinishScreen> {
             child: FlatButton(
               onPressed: () => onReCapture(),
               child: Text(
-                "Chụp lại khuôn mặt",
+                "Thực hiện lại",
                 style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
@@ -92,14 +130,7 @@ class _FinishSceen extends State<FinishScreen> {
                   borderRadius: new BorderRadius.circular(30)),
             ),
           ),
-          Expanded(
-            child: ListView.builder(
-              itemBuilder: (context, index) {
-                return items(data[index]);
-              },
-              itemCount: data.length,
-            ),
-          ),
+          renderMain(),
         ],
       )),
     );
@@ -108,7 +139,75 @@ class _FinishSceen extends State<FinishScreen> {
   // list view
 
   void onReCapture() {
-    Navigator.pop(context);
+    // Navigator.pop(context);
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => UploadIdentityCardScreen()),
+    );
+  }
+
+  // --------------- read data --------------------------
+  Future getData() async {
+    final prefs = await SharedPreferences.getInstance();
+    data.add(UserInfo('Loại thẻ', prefs.getString('identCardType')));
+    data.add(
+        UserInfo('Chứng minh nhân dân số', prefs.getString('identCardNumber')));
+    data.add(UserInfo('Họ và tên', prefs.getString('identCardName')));
+    data.add(
+        UserInfo('Ngày,tháng,năm,sinh', prefs.getString('identCardBirthDate')));
+    data.add(UserInfo('Quê quán', prefs.getString('identCardCountry')));
+    data.add(UserInfo(
+        'Địa chỉ thường chú', prefs.getString('identCardAdrResidence')));
+    data.add(UserInfo('Giới tính', prefs.getString('identCardGender')));
+    data.add(UserInfo('Ngày cấp', prefs.getString('identCardIssueDate')));
+    data.add(
+        UserInfo('Có giá trị đến', prefs.getString('identCardExpireDate')));
+    data.add(UserInfo('Dân tộc/Quốc tịch', prefs.getString('identCardEthnic')));
+    data.add(widget.path1);
+    data.add(widget.path2);
+
+    setState(() {
+      isloading = false;
+    });
+
+    log('GUID FINISH SCREEN : ' + prefs.getString('guid'));
+  }
+  // --------------------- liveness ---------------------------------
+
+  void faceVerify() async {
+    log('PATH FACE IMAGE FINISH SCREEN :' +
+        widget.path3 +
+        ' - ' +
+        widget.path4 +
+        ' - ' +
+        widget.path5);
+    String token, guid;
+    final prefs = await SharedPreferences.getInstance();
+    token = prefs.getString('Token');
+    guid = prefs.getString('guid');
+    var URL = base.URL_FACE;
+    var req = new http.MultipartRequest("POST", Uri.parse(URL));
+    Map<String, String> headers = {"Authorization": "Bear " + token};
+    req.files
+        .add(await http.MultipartFile.fromPath('CaptureImage1', widget.path3));
+    req.files
+        .add(await http.MultipartFile.fromPath('CaptureImage2', widget.path4));
+    req.files
+        .add(await http.MultipartFile.fromPath('CaptureImage3', widget.path5));
+    req.fields['GuidID'] = guid;
+    req.headers.addAll(headers);
+
+    var res = await req.send();
+    res.stream.transform(utf8.decoder).listen((response) async {
+      log("RESPONSE_FACEVERIFY :" + response);
+      var parsed = json.decode(response);
+      var data = parsed['data'];
+
+      setState(() {
+        result = data['result'];
+        compareFace = false;
+      });
+    });
   }
 }
 

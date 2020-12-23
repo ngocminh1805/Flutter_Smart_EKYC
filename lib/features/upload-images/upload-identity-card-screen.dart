@@ -22,11 +22,15 @@ class _UploadIdentityCardScreen extends State<UploadIdentityCardScreen> {
   List cameras;
   int selectedCameraIdx; // choose front camera ar back camera
   int step = 0;
-  String imagePath1;
-  String imagePath2;
-  String imagePath3;
+  String imagePath1; // front identitycard
+  String imagePath2; // back indentitycard
+  String imagePath3; // face image 1
+  String imagePath4; // face image 2
+  String imagePath5; // face image 3
   bool preview = false;
   String token;
+  bool check_ocr = false;
+  double process_value = 0.1;
 
   @override
   void initState() {
@@ -49,6 +53,7 @@ class _UploadIdentityCardScreen extends State<UploadIdentityCardScreen> {
     });
     //
   }
+//
 
 // -------------------  -----------------------------------------
   Future _initCameraController(CameraDescription cameraDescription) async {
@@ -92,6 +97,7 @@ class _UploadIdentityCardScreen extends State<UploadIdentityCardScreen> {
       return previewImage(imagePath2);
     } else {
       return Container(
+        alignment: Alignment.center,
         child: Stack(
           children: <Widget>[_cameraPreviewWidget(), _sq()],
         ),
@@ -108,7 +114,8 @@ class _UploadIdentityCardScreen extends State<UploadIdentityCardScreen> {
       );
     }
     return AspectRatio(
-      aspectRatio: controller.value.aspectRatio,
+      // aspectRatio: controller.value.aspectRatio,
+      aspectRatio: 9 / 16,
       child: CameraPreview(controller),
     );
   }
@@ -175,6 +182,30 @@ class _UploadIdentityCardScreen extends State<UploadIdentityCardScreen> {
           ],
         ),
       );
+    } else if (step > 1) {
+      return Container(
+          height: 70,
+          child: Center(
+            child: Column(
+              children: <Widget>[
+                Container(
+                  padding: EdgeInsets.all(8),
+                  child: Text(
+                    'Đặt mặt vào khung camera',
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                ),
+                Container(
+                  padding: EdgeInsets.only(right: 30, left: 30),
+                  child: LinearProgressIndicator(
+                    value: process_value,
+                    backgroundColor: Colors.blueGrey,
+                    valueColor: new AlwaysStoppedAnimation<Color>(Colors.green),
+                  ),
+                )
+              ],
+            ),
+          ));
     } else {
       return Container(
         height: 60,
@@ -208,6 +239,7 @@ class _UploadIdentityCardScreen extends State<UploadIdentityCardScreen> {
         opacity: 0.5,
         child: Image(
           image: AssetImage('assets/sq.png'),
+          fit: BoxFit.fitHeight,
         ),
       ));
     } else {
@@ -216,6 +248,7 @@ class _UploadIdentityCardScreen extends State<UploadIdentityCardScreen> {
         opacity: 0.5,
         child: Image(
           image: AssetImage('assets/sq2.png'),
+          fit: BoxFit.fitWidth,
         ),
       ));
     }
@@ -250,46 +283,40 @@ class _UploadIdentityCardScreen extends State<UploadIdentityCardScreen> {
     );
   }
 
-  // ------------------- on press capture -----------------------
-  void onCapturePressed() async {
+  // ------------------- capture image --------------------------------
+
+  Future<String> capture() async {
     try {
-      // 1
       final path = join(
         (await getTemporaryDirectory()).path,
-        '${DateTime.now()}.png',
+        '${DateTime.now()}.jpeg',
       );
-      // 2
       await controller.takePicture(path);
-      log("PATH IMAGES : " + path);
-      log("STEP :  ${step}");
-      if (step == 0) {
-        setState(() {
-          imagePath1 = path;
-          preview = true;
-        });
-      } else if (step == 1) {
-        setState(() {
-          imagePath2 = path;
-          preview = true;
-        });
-      } else {
-        ocr();
-        setState(() {
-          imagePath3 = path;
-        });
-        Navigator.push(
-          this.context,
-          MaterialPageRoute(
-              builder: (context) => FinishScreen(
-                    path1: imagePath1,
-                    path2: imagePath2,
-                    path3: imagePath3,
-                  )),
-        );
-      }
+      return path;
     } catch (e) {
       print(e);
     }
+    return '';
+  }
+
+  // ------------------- on press capture -----------------------
+  void onCapturePressed() async {
+    capture().then((path) => {
+          if (step == 0)
+            {
+              setState(() {
+                imagePath1 = path;
+                preview = true;
+              })
+            }
+          else if (step == 1)
+            {
+              setState(() {
+                imagePath2 = path;
+                preview = true;
+              })
+            }
+        });
   }
 
 //--------------------- switch camera -----------------------------
@@ -304,6 +331,11 @@ class _UploadIdentityCardScreen extends State<UploadIdentityCardScreen> {
   void onConfirm() {
     if (step == 1) {
       onSwitchCamera();
+      setState(() {
+        preview = false;
+        step++;
+      });
+      checkFace();
     }
     setState(() {
       preview = false;
@@ -319,7 +351,59 @@ class _UploadIdentityCardScreen extends State<UploadIdentityCardScreen> {
   }
 
   // --------------- check face ---------------------
-  void checkFace() {}
+  void checkFace() {
+    ocr().then((value) => null).whenComplete(() => {
+          log('............... Check Face ........................'),
+          // Future.delayed(const Duration(milliseconds: 3000), () {
+// capture face image 1
+          capture()
+              .then((path) => {
+                    setState(() {
+                      imagePath3 = path;
+                      process_value = 0.4;
+                    })
+                  })
+              .whenComplete(
+                  () => Future.delayed(const Duration(milliseconds: 1500), () {
+// capture face image 2
+                        capture()
+                            .then((path) => setState(() {
+                                  imagePath4 = path;
+                                  process_value = 0.7;
+                                }))
+                            .whenComplete(() => Future.delayed(
+                                    const Duration(milliseconds: 1500), () {
+// capture face image 3
+                                  capture()
+                                      .then((path) => setState(() {
+                                            imagePath5 = path;
+                                            process_value = 1;
+                                          }))
+                                      .whenComplete(() => {
+                                            log('PATH FACE IMAGE :' +
+                                                imagePath3 +
+                                                ' - ' +
+                                                imagePath4 +
+                                                ' - ' +
+                                                imagePath5),
+                                            Navigator.push(
+                                              this.context,
+                                              MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      FinishScreen(
+                                                        path1: imagePath1,
+                                                        path2: imagePath2,
+                                                        path3: imagePath3,
+                                                        path4: imagePath4,
+                                                        path5: imagePath5,
+                                                      )),
+                                            )
+                                          });
+                                }));
+                      }))
+          // })
+        });
+  }
 
   // --------------- OCR ----------------------------
   Future ocr() async {
@@ -338,8 +422,30 @@ class _UploadIdentityCardScreen extends State<UploadIdentityCardScreen> {
     req.headers.addAll(headers);
 
     var res = await req.send();
-    res.stream.transform(utf8.decoder).listen((response) {
+    res.stream.transform(utf8.decoder).listen((response) async {
       log("RESPONSE_OCR :" + response);
+      var parsed = json.decode(response);
+      var data = parsed['data']['idCard'];
+      log("RESPONSE_OCR_DATA :" + parsed['data']['idCard'].toString());
+
+      final prefs = await SharedPreferences.getInstance();
+      prefs.setString('identCardType', data['identCardType'].toString());
+      prefs.setString('identCardNumber', data['identCardNumber'].toString());
+      prefs.setString('identCardName', data['identCardName'].toString());
+      prefs.setString(
+          'identCardBirthDate', data['identCardBirthDate'].toString());
+      prefs.setString('identCardEthnic', data['identCardEthnic'].toString());
+      prefs.setString('identCardCountry', data['identCardCountry'].toString());
+      prefs.setString(
+          'identCardAdrResidence', data['identCardAdrResidence'].toString());
+      prefs.setString(
+          'identCardIssueDate', data['identCardIssueDate'].toString());
+      prefs.setString('identCardGender', data['identCardGender'].toString());
+      prefs.setString(
+          'identCardExpireDate', data['identCardExpireDate'].toString());
+      prefs.setString('guid', data['guid']);
+
+      log('LOAI THE' + data['identCardType'].toString());
     });
   }
 }

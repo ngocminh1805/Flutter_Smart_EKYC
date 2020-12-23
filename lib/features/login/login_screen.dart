@@ -11,7 +11,8 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
-        padding: EdgeInsets.only(left: 20, right: 20, bottom: 10, top: 100),
+        alignment: Alignment.center,
+        padding: EdgeInsets.only(left: 20, right: 20, bottom: 10, top: 70),
         child: Column(
           children: <Widget>[
             // --------------- logo ---------------------
@@ -23,6 +24,7 @@ class _LoginScreenState extends State<LoginScreen> {
             Text(
               "Copyright © 2020 Smart eKYC. Designed by Hyperlogy.",
               style: TextStyle(color: Colors.blueGrey),
+              textAlign: TextAlign.center,
             )
           ],
         ),
