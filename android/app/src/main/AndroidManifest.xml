@@ -8,7 +8,7 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <application
         android:name="io.flutter.app.FlutterApplication"
-        android:label="smart_ekyc_hyperlogy"
+        android:label="smart_ekyc"
         android:icon="@mipmap/ic_launcher">
         
         <activity
