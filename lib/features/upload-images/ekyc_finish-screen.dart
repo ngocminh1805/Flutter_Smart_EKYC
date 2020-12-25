@@ -3,14 +3,14 @@ import 'dart:developer';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:smart_ekyc/api/base.dart';
-import 'package:smart_ekyc/features/login/login_screen.dart';
-import 'package:smart_ekyc/features/upload-images/components/image-preview.dart';
-import 'package:smart_ekyc/features/upload-images/components/user-info-item.dart';
+import 'package:smart_ekyc/api/ekyc_base-api.dart';
+import 'package:smart_ekyc/features/login/ekyc_login_screen.dart';
+import 'package:smart_ekyc/features/upload-images/components/ekyc_image-preview.dart';
+import 'package:smart_ekyc/features/upload-images/components/ekyc_user-info-item.dart';
 import 'package:http/http.dart' as http;
-import 'package:smart_ekyc/features/upload-images/upload-identity-card-screen.dart';
+import 'package:smart_ekyc/features/upload-images/ekyc_upload-identity-card-screen.dart';
 
-import 'models/user-info.dart';
+import 'models/ekyc_user-info.dart';
 
 class FinishScreen extends StatefulWidget {
   final String path1; // image front identity card
@@ -32,20 +32,21 @@ class _FinishSceen extends State<FinishScreen> {
   String message = 'Đang so sánh khuôn mặt';
   bool matchingResult; // so sánh khuôn mặt khớp hay không do api trả về
   bool compareFace = true; // đang đợi so sánh
+  String userImage = '';
 
   @override
   void initState() {
     getData();
-    faceVerify();
+    liveNess();
     super.initState();
   }
 
   // -------------- item hiển thị dữ liệu CMT ------------------------------------------------------------------------------------------
   Widget items(item) {
-    if (item.runtimeType == UserInfo) {
-      return UserInfoItem(label: item.label, value: item.value);
+    if (item.runtimeType == EkycUserInfo) {
+      return EkycUserInfoItem(label: item.label, value: item.value);
     } else {
-      return ImagePreview(path: item);
+      return EkycImagePreview(path: item);
     }
   }
 
@@ -155,6 +156,48 @@ class _FinishSceen extends State<FinishScreen> {
     }
   }
 
+  // ------------------ render user images path--------------------------------------------------------------------------------------
+  String checkUserImage(int num) {
+    switch (num) {
+      case 1:
+        return widget.path3;
+        break;
+      case 2:
+        return widget.path4;
+        break;
+      case 3:
+        return widget.path5;
+        break;
+      default:
+        return '';
+    }
+  }
+
+  // --------------------- render user image widget ----------------------------------------------------------------------------
+
+  Widget renderUserImage() {
+    if (userImage.isNotEmpty) {
+      return Container(
+        padding: EdgeInsets.only(bottom: 20),
+        child: CircleAvatar(
+          backgroundImage: FileImage(File(userImage)),
+          radius: 75,
+        ),
+      );
+    } else {
+      return Container(
+        padding: EdgeInsets.only(bottom: 20),
+        child: CircleAvatar(
+          child: Icon(
+            Icons.person,
+            size: 100,
+          ),
+          radius: 75,
+        ),
+      );
+    }
+  }
+
   // ------------------ render screen --------------------------------------------------------------------------------------------
   @override
   Widget build(BuildContext context) {
@@ -173,16 +216,7 @@ class _FinishSceen extends State<FinishScreen> {
             padding: EdgeInsets.only(top: 40, bottom: 10),
             decoration: BoxDecoration(border: Border.all(width: 1)),
             child: Column(
-              children: <Widget>[
-                Container(
-                  padding: EdgeInsets.only(bottom: 20),
-                  child: CircleAvatar(
-                    backgroundImage: FileImage(File(widget.path3)),
-                    radius: 75,
-                  ),
-                ),
-                renderMess()
-              ],
+              children: <Widget>[renderUserImage(), renderMess()],
             ),
           ),
           renderButton(),
@@ -198,7 +232,7 @@ class _FinishSceen extends State<FinishScreen> {
     // Navigator.pop(context);
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => UploadIdentityCardScreen()),
+      MaterialPageRoute(builder: (context) => EkycUploadIdentityCardScreen()),
     );
 
     // Navigator.pushAndRemoveUntil(
@@ -217,27 +251,28 @@ class _FinishSceen extends State<FinishScreen> {
 
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => LoginScreen()),
+      MaterialPageRoute(builder: (context) => EkycLoginScreen()),
     );
   }
 
   // --------------- read data ocr - đọc data ocr từ SharePreferences ----------------------------------------------------------
   Future getData() async {
     final prefs = await SharedPreferences.getInstance();
-    data.add(UserInfo('Loại thẻ', prefs.getString('identCardType')));
-    data.add(
-        UserInfo('Chứng minh nhân dân số', prefs.getString('identCardNumber')));
-    data.add(UserInfo('Họ và tên', prefs.getString('identCardName')));
-    data.add(
-        UserInfo('Ngày,tháng,năm,sinh', prefs.getString('identCardBirthDate')));
-    data.add(UserInfo('Quê quán', prefs.getString('identCardCountry')));
-    data.add(UserInfo(
+    data.add(EkycUserInfo('Loại thẻ', prefs.getString('identCardType')));
+    data.add(EkycUserInfo(
+        'Chứng minh nhân dân số', prefs.getString('identCardNumber')));
+    data.add(EkycUserInfo('Họ và tên', prefs.getString('identCardName')));
+    data.add(EkycUserInfo(
+        'Ngày,tháng,năm,sinh', prefs.getString('identCardBirthDate')));
+    data.add(EkycUserInfo('Quê quán', prefs.getString('identCardCountry')));
+    data.add(EkycUserInfo(
         'Địa chỉ thường chú', prefs.getString('identCardAdrResidence')));
-    data.add(UserInfo('Giới tính', prefs.getString('identCardGender')));
-    data.add(UserInfo('Ngày cấp', prefs.getString('identCardIssueDate')));
+    data.add(EkycUserInfo('Giới tính', prefs.getString('identCardGender')));
+    data.add(EkycUserInfo('Ngày cấp', prefs.getString('identCardIssueDate')));
     data.add(
-        UserInfo('Có giá trị đến', prefs.getString('identCardExpireDate')));
-    data.add(UserInfo('Dân tộc/Quốc tịch', prefs.getString('identCardEthnic')));
+        EkycUserInfo('Có giá trị đến', prefs.getString('identCardExpireDate')));
+    data.add(
+        EkycUserInfo('Dân tộc/Quốc tịch', prefs.getString('identCardEthnic')));
     data.add(widget.path1);
     data.add(widget.path2);
 
@@ -249,7 +284,7 @@ class _FinishSceen extends State<FinishScreen> {
   }
 
   // -------------- hàm gọi api liveness so sánh khuôn mặt ----------------------------------------------------------------------
-  void faceVerify() async {
+  void liveNess() async {
     log('PATH FACE IMAGE FINISH SCREEN :' +
         widget.path3 +
         ' - ' +
@@ -279,15 +314,18 @@ class _FinishSceen extends State<FinishScreen> {
 
     var res = await req.send();
     res.stream.transform(utf8.decoder).listen((response) async {
-      log("RESPONSE_FACEVERIFY :" + response);
+      log("RESPONSE_liveNess :" + response);
       var parsed = json.decode(response);
       var data = parsed['data'];
 
       // ----------- set state cho biết nhận diện thành công hay không -------------------------------------------
-      setState(() {
-        matchingResult = data['matchingResult'];
-        compareFace = false;
-      });
+      if (data != null) {
+        setState(() {
+          matchingResult = data['matchingResult'];
+          compareFace = false;
+          userImage = checkUserImage(data['imageNumber']);
+        });
+      }
     });
   }
 }

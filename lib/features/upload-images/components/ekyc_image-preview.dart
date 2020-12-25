@@ -1,15 +1,15 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 
-class ImagePreview extends StatefulWidget {
+class EkycImagePreview extends StatefulWidget {
   final String path;
-  ImagePreview({this.path});
+  EkycImagePreview({this.path});
 
   @override
-  _ImagePreView createState() => _ImagePreView();
+  _EkycImagePreView createState() => _EkycImagePreView();
 }
 
-class _ImagePreView extends State<ImagePreview> {
+class _EkycImagePreView extends State<EkycImagePreview> {
   @override
   Widget build(BuildContext context) {
     return Container(

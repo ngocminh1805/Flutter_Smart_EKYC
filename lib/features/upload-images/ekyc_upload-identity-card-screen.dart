@@ -7,16 +7,18 @@ import 'package:flutter/rendering.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:smart_ekyc/api/base.dart';
-import 'package:smart_ekyc/features/upload-images/finish-screen.dart';
+import 'package:smart_ekyc/api/ekyc_base-api.dart';
+import 'package:smart_ekyc/features/upload-images/ekyc_finish-screen.dart';
 import 'package:http/http.dart' as http;
 
-class UploadIdentityCardScreen extends StatefulWidget {
+class EkycUploadIdentityCardScreen extends StatefulWidget {
   @override
-  _UploadIdentityCardScreen createState() => new _UploadIdentityCardScreen();
+  _EkycUploadIdentityCardScreen createState() =>
+      new _EkycUploadIdentityCardScreen();
 }
 
-class _UploadIdentityCardScreen extends State<UploadIdentityCardScreen> {
+class _EkycUploadIdentityCardScreen
+    extends State<EkycUploadIdentityCardScreen> {
   var base = Base();
   CameraController controller;
   List cameras;
@@ -239,7 +241,7 @@ class _UploadIdentityCardScreen extends State<UploadIdentityCardScreen> {
           child: Opacity(
         opacity: 0.5,
         child: Image(
-          image: AssetImage('assets/sq.png'),
+          image: AssetImage('lib/assets/sq.png'),
           fit: BoxFit.fitHeight,
         ),
       ));
@@ -248,7 +250,7 @@ class _UploadIdentityCardScreen extends State<UploadIdentityCardScreen> {
           child: Opacity(
         opacity: 0.5,
         child: Image(
-          image: AssetImage('assets/sq2.png'),
+          image: AssetImage('lib/assets/sq2.png'),
           fit: BoxFit.fitWidth,
         ),
       ));
@@ -498,11 +500,11 @@ class _UploadIdentityCardScreen extends State<UploadIdentityCardScreen> {
   void oncloseDialog() {
     // Navigator.pushAndRemoveUntil(
     //     this.context,
-    //     MaterialPageRoute(builder: (context) => UploadIdentityCardScreen()),
+    //     MaterialPageRoute(builder: (context) => EkycUploadIdentityCardScreen()),
     //     (route) => false);
     Navigator.pushReplacement(
       this.context,
-      MaterialPageRoute(builder: (context) => UploadIdentityCardScreen()),
+      MaterialPageRoute(builder: (context) => EkycUploadIdentityCardScreen()),
     );
   }
 }

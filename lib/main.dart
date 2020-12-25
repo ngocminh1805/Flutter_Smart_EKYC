@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:smart_ekyc/features/login/login_screen.dart';
+import 'package:smart_ekyc/features/login/ekyc_login_screen.dart';
 
 void main() => runApp(MyApp());
 
@@ -13,20 +13,20 @@ class MyApp extends StatelessWidget {
           primarySwatch: Colors.blueGrey,
           visualDensity: VisualDensity.adaptivePlatformDensity,
         ),
-        home: Main());
+        home: MainApp());
   }
 }
 
-class Main extends StatefulWidget {
+class MainApp extends StatefulWidget {
   @override
-  _MainState createState() => _MainState();
+  _MainAppState createState() => _MainAppState();
 }
 
-class _MainState extends State<Main> {
+class _MainAppState extends State<MainApp> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: LoginScreen(),
+      body: EkycLoginScreen(),
     );
   }
 }

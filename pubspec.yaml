@@ -51,20 +51,20 @@ flutter:
 
   # To add assets to your application, add an assets section, like this:
   assets:
-    - assets/hyper-logo.png
-    - assets/bg.jpg
-    - assets/checkbox_false.png
-    - assets/checkbox_true.png
-    - assets/eximbank-logo.png
-    - assets/hyper-logo.png
-    - assets/no-face.jpg
-    - assets/no-image.jpeg
-    - assets/password.png
-    - assets/sq.png
-    - assets/sq2.png
-    - assets/username.png
-    - assets/vts-logo.png
-    - assets/image.png
+    - lib/assets/hyper-logo.png
+    - lib/assets/bg.jpg
+    - lib/assets/checkbox_false.png
+    - lib/assets/checkbox_true.png
+    - lib/assets/eximbank-logo.png
+    - lib/assets/hyper-logo.png
+    - lib/assets/no-face.jpg
+    - lib/assets/no-image.jpeg
+    - lib/assets/password.png
+    - lib/assets/sq.png
+    - lib/assets/sq2.png
+    - lib/assets/username.png
+    - lib/assets/vts-logo.png
+    - lib/assets/image.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.

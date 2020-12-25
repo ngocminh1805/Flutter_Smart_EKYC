@@ -2,16 +2,16 @@ import 'dart:convert';
 import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:smart_ekyc/api/base.dart';
-import 'package:smart_ekyc/features/upload-images/upload-identity-card-screen.dart';
+import 'package:smart_ekyc/api/ekyc_base-api.dart';
+import 'package:smart_ekyc/features/upload-images/ekyc_upload-identity-card-screen.dart';
 import 'package:http/http.dart' as http;
 
-class FormInput extends StatefulWidget {
+class EkycFormInput extends StatefulWidget {
   @override
-  _FormInput createState() => _FormInput();
+  _EkycFormInput createState() => _EkycFormInput();
 }
 
-class _FormInput extends State<FormInput> {
+class _EkycFormInput extends State<EkycFormInput> {
   final userNameContoller = TextEditingController();
   final passWordController = TextEditingController();
   bool isUserNameValidate = false;
@@ -101,7 +101,7 @@ class _FormInput extends State<FormInput> {
       getToken();
       Navigator.push(
         context,
-        MaterialPageRoute(builder: (context) => UploadIdentityCardScreen()),
+        MaterialPageRoute(builder: (context) => EkycUploadIdentityCardScreen()),
       );
     }
   }

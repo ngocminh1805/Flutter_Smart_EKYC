@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:smart_ekyc/features/login/components/form-input.dart';
+import 'package:smart_ekyc/features/login/components/ekyc_form-input.dart';
 
-class LoginScreen extends StatefulWidget {
+class EkycLoginScreen extends StatefulWidget {
   @override
-  _LoginScreenState createState() => new _LoginScreenState();
+  _EkycLoginScreenState createState() => new _EkycLoginScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
+class _EkycLoginScreenState extends State<EkycLoginScreen> {
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
@@ -20,10 +20,10 @@ class _LoginScreenState extends State<LoginScreen> {
             child: Column(
               children: <Widget>[
                 // --------------- logo ---------------------
-                Image(image: AssetImage('assets/hyper-logo.png')),
+                Image(image: AssetImage('lib/assets/hyper-logo.png')),
 
                 //--------------- Form input  ---------------------
-                FormInput(),
+                EkycFormInput(),
 
                 // ------------ bottom text -------------------------
                 Text(

@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
 
-class UserInfoItem extends StatefulWidget {
+class EkycUserInfoItem extends StatefulWidget {
   final String label;
   final String value;
 
-  UserInfoItem({this.label, this.value});
+  EkycUserInfoItem({this.label, this.value});
 
   @override
-  _UserInfoItem createState() => _UserInfoItem();
+  _EkycUserInfoItem createState() => _EkycUserInfoItem();
 }
 
-class _UserInfoItem extends State<UserInfoItem> {
+class _EkycUserInfoItem extends State<EkycUserInfoItem> {
   String label;
   String value;
   final valueController = new TextEditingController();
