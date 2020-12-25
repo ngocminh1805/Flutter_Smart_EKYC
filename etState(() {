@@ -1,0 +1,47 @@
+[33mcommit ee99697de2146ac8e0b85c75f7bfdd60702863dd[m[33m ([m[1;36mHEAD -> [m[1;32mmaster[m[33m, [m[1;31morigin/master[m[33m, [m[1;31morigin/HEAD[m[33m)[m
+Author: ngocminh180599 <ngocminhmtp123@gmail.com>
+Date:   Fri Dec 25 08:12:03 2020 +0700
+
+    update feature/liveness
+
+[33mcommit 041117e4c06a5f87f4739ab7377bb3f2a5e87b13[m
+Author: unknown <ngocminhmtp123@gmail.com>
+Date:   Wed Dec 23 22:53:52 2020 +0700
+
+    update
+
+[33mcommit a3b186772b3980f3bdbe156bdd4ffa826ffacbc6[m
+Author: unknown <ngocminhmtp123@gmail.com>
+Date:   Wed Dec 23 15:14:36 2020 +0700
+
+    update feature/face_verify
+
+[33mcommit f72a1884f0ea40db5ff56eede6d0fbd008fa8ac1[m
+Author: unknown <ngocminhmtp123@gmail.com>
+Date:   Wed Dec 23 15:13:30 2020 +0700
+
+    update feature/face_verify
+
+[33mcommit 85f24cfa3cbe0bc721fe634766aa1b81a6dd4e17[m
+Author: unknown <ngocminhmtp123@gmail.com>
+Date:   Tue Dec 22 16:12:57 2020 +0700
+
+    update feature/upload identity card
+
+[33mcommit d46b0c25fbdead0daa326511fbba6db7947e0b6b[m
+Author: unknown <ngocminhmtp123@gmail.com>
+Date:   Fri Dec 18 10:19:57 2020 +0700
+
+    update feature/finish screen
+
+[33mcommit 8c1b50b12ff2bd80f30b2ad6eb1bbb062a76c285[m
+Author: unknown <ngocminhmtp123@gmail.com>
+Date:   Thu Dec 17 00:09:16 2020 +0700
+
+    update feature/login
+
+[33mcommit 9b3f9f11e9a4763d66095903ff159e6cdff4ebc7[m
+Author: unknown <ngocminhmtp123@gmail.com>
+Date:   Wed Dec 16 14:37:23 2020 +0700
+
+    create new app

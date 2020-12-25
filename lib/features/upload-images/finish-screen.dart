@@ -284,10 +284,12 @@ class _FinishSceen extends State<FinishScreen> {
       var data = parsed['data'];
 
       // ----------- set state cho biết nhận diện thành công hay không -------------------------------------------
-      setState(() {
-        matchingResult = data['matchingResult'];
-        compareFace = false;
-      });
+      if (data != null) {
+        setState(() {
+          matchingResult = data['matchingResult'];
+          compareFace = false;
+        });
+      }
     });
   }
 }
