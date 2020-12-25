@@ -30,7 +30,7 @@ class _UploadIdentityCardScreen extends State<UploadIdentityCardScreen> {
   String imagePath5; // face image 3
   bool preview = false; // preview ảnh sau khi chụp
   String token; // user token
-  String ocr_messages; // messages được ocr trả về
+  String ocr_messages = ''; // messages được ocr trả về
   double process_value = 0.1; // giá trị của process bar chụp ảnh khuôn mặt
 
   @override
@@ -258,7 +258,13 @@ class _UploadIdentityCardScreen extends State<UploadIdentityCardScreen> {
   // ----------------------- build -----------------------------------------
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return
+        //  WillPopScope(
+        //     onWillPop: () {
+        //       return new Future(() => false);
+        //     },
+        //     child:
+        Scaffold(
       body: Container(
         padding: EdgeInsets.only(
           top: 30,
@@ -281,6 +287,7 @@ class _UploadIdentityCardScreen extends State<UploadIdentityCardScreen> {
           ],
         ),
       ),
+      // )
     );
   }
 
@@ -354,19 +361,26 @@ class _UploadIdentityCardScreen extends State<UploadIdentityCardScreen> {
   // ------------ check face - hàm gọi ocr và chụp 3 ảnh  khuôn mặt (sau khi ocr thực hiện xong sẽ tiến hành chụp ảnh khuôn mặt)
   void checkFace() {
     ocr().then((value) => null).whenComplete(() => {
-          log('............... Check Face ........................'),
-          // Future.delayed(const Duration(milliseconds: 3000), () {
-// capture face image 1
-          capture()
-              .then((path) => {
-                    setState(() {
-                      imagePath3 = path;
-                      process_value = 0.4;
-                    })
-                  })
-              .whenComplete(
-                  () => Future.delayed(const Duration(milliseconds: 1500), () {
-// capture face image 2
+          if (ocr_messages.trim().toLowerCase() == 'cắt góc' ||
+              ocr_messages.trim().toLowerCase() == "đục lỗ" ||
+              ocr_messages.trim().toLowerCase() == "mờ" ||
+              ocr_messages.trim().toLowerCase() == "lóa")
+            {showMessage(ocr_messages)}
+          else
+            {
+              log('............... Check Face ........................'),
+              // Future.delayed(const Duration(milliseconds: 3000), () {
+// --------------------------- capture face image 1 --------------------
+              capture()
+                  .then((path) => {
+                        setState(() {
+                          imagePath3 = path;
+                          process_value = 0.4;
+                        })
+                      })
+                  .whenComplete(() =>
+                      Future.delayed(const Duration(milliseconds: 1500), () {
+// ----------------------------- capture face image 2 -------------------
                         capture()
                             .then((path) => setState(() {
                                   imagePath4 = path;
@@ -374,7 +388,7 @@ class _UploadIdentityCardScreen extends State<UploadIdentityCardScreen> {
                                 }))
                             .whenComplete(() => Future.delayed(
                                     const Duration(milliseconds: 1500), () {
-// capture face image 3
+// ----------------------------- capture face image 3 -------------------------
                                   capture()
                                       .then((path) => setState(() {
                                             imagePath5 = path;
@@ -402,6 +416,8 @@ class _UploadIdentityCardScreen extends State<UploadIdentityCardScreen> {
                                           });
                                 }));
                       }))
+            }
+
           // })
         });
   }
@@ -449,11 +465,44 @@ class _UploadIdentityCardScreen extends State<UploadIdentityCardScreen> {
       prefs.setString('guid', data['guid']);
 
       var message = parsed['data']['messages '];
-      setState(() {
-        ocr_messages = message;
-      });
-
-      log('LOAI THE' + data['identCardType'].toString());
+      if (message != null) {
+        setState(() {
+          ocr_messages = message;
+        });
+        log('OCR_MESSAGES: ' + message);
+      }
     });
+  }
+
+  // ---------- show message - hiển thị alert message ocr -------------------------
+  void showMessage(String msg) {
+    // set up the AlertDialog
+    AlertDialog alert = AlertDialog(
+      title: Text("Lỗi"),
+      content: Text('Ảnh chụp không hợp lệ: ' + msg),
+      actions: <Widget>[
+        FlatButton(onPressed: () => oncloseDialog(), child: Text('Ok'))
+      ],
+    );
+
+    // show the dialog
+    showDialog(
+      context: this.context,
+      builder: (BuildContext context) {
+        return alert;
+      },
+    );
+  }
+
+  //-------------------- close dialog - đóng dialog và thực hiện chụp ảnh lại-----------
+  void oncloseDialog() {
+    // Navigator.pushAndRemoveUntil(
+    //     this.context,
+    //     MaterialPageRoute(builder: (context) => UploadIdentityCardScreen()),
+    //     (route) => false);
+    Navigator.pushReplacement(
+      this.context,
+      MaterialPageRoute(builder: (context) => UploadIdentityCardScreen()),
+    );
   }
 }

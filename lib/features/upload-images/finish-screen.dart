@@ -13,11 +13,11 @@ import 'package:smart_ekyc/features/upload-images/upload-identity-card-screen.da
 import 'models/user-info.dart';
 
 class FinishScreen extends StatefulWidget {
-  final String path1;
-  final String path2;
-  final String path3;
-  final String path4;
-  final String path5;
+  final String path1; // image front identity card
+  final String path2; // image back identity card
+  final String path3; // image face 1
+  final String path4; // image face 2
+  final String path5; // image face 3
 
   FinishScreen({this.path1, this.path2, this.path3, this.path4, this.path5});
 
@@ -92,7 +92,24 @@ class _FinishSceen extends State<FinishScreen> {
   Widget renderButton() {
     // ----------------đang so sánh thì không hiện gì -----------------------------------------------------
     if (compareFace) {
-      return Container();
+      return Container(
+        width: MediaQuery.of(context).size.width,
+        padding: EdgeInsets.only(right: 20, left: 20),
+        decoration: BoxDecoration(border: Border(bottom: BorderSide(width: 1))),
+        // color: Colors.blueGrey,
+        child: FlatButton(
+          onPressed: () => onReCapture(),
+          child: Text(
+            "Thực hiện lại",
+            style: TextStyle(
+                fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
+          ),
+          color: Colors.blueGrey,
+          padding: EdgeInsets.only(bottom: 5, top: 5, left: 30, right: 30),
+          shape: new RoundedRectangleBorder(
+              borderRadius: new BorderRadius.circular(30)),
+        ),
+      );
     }
     // ---------------- so sánh trùng khớp ---------------------- ------------------------------------------
     else if (matchingResult) {
@@ -141,7 +158,13 @@ class _FinishSceen extends State<FinishScreen> {
   // ------------------ render screen --------------------------------------------------------------------------------------------
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return
+        //  WillPopScope(
+        //     onWillPop: () {
+        //       return new Future(() => false);
+        //     },
+        //     child:
+        Scaffold(
       body: Container(
           child: Column(
         children: <Widget>[
@@ -167,29 +190,35 @@ class _FinishSceen extends State<FinishScreen> {
         ],
       )),
     );
+    // );
   }
 
   //--------------------------- thực hiện lại thao tác --------------------------------------------------------------------------
   void onReCapture() {
     // Navigator.pop(context);
-    // Navigator.push(
-    //   context,
-    //   MaterialPageRoute(builder: (context) => UploadIdentityCardScreen()),
-    // );
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => UploadIdentityCardScreen()),
+    );
 
-    Navigator.pushAndRemoveUntil(
-        context,
-        MaterialPageRoute(builder: (context) => UploadIdentityCardScreen()),
-        (route) => false);
+    // Navigator.pushAndRemoveUntil(
+    //     context,
+    //     MaterialPageRoute(builder: (context) => UploadIdentityCardScreen()),
+    //     (route) => false);
   }
 
   // --------------------------- hoàn thành đăng ký ---------------------------------------------------------------------------
 
   void onComplete() {
-    Navigator.pushAndRemoveUntil(
-        context,
-        MaterialPageRoute(builder: (context) => LoginScreen()),
-        (route) => false);
+    // Navigator.pushAndRemoveUntil(
+    //     context,
+    //     MaterialPageRoute(builder: (context) => LoginScreen()),
+    //     (route) => false);
+
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => LoginScreen()),
+    );
   }
 
   // --------------- read data ocr - đọc data ocr từ SharePreferences ----------------------------------------------------------

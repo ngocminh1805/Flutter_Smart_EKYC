@@ -9,27 +9,31 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Container(
-        alignment: Alignment.center,
-        padding: EdgeInsets.only(left: 20, right: 20, bottom: 10, top: 70),
-        child: Column(
-          children: <Widget>[
-            // --------------- logo ---------------------
-            Image(image: AssetImage('assets/hyper-logo.png')),
+    return WillPopScope(
+        onWillPop: () {
+          return new Future(() => false);
+        },
+        child: Scaffold(
+          body: Container(
+            alignment: Alignment.center,
+            padding: EdgeInsets.only(left: 20, right: 20, bottom: 10, top: 70),
+            child: Column(
+              children: <Widget>[
+                // --------------- logo ---------------------
+                Image(image: AssetImage('assets/hyper-logo.png')),
 
-            //--------------- Form input  ---------------------
-            FormInput(),
+                //--------------- Form input  ---------------------
+                FormInput(),
 
-            // ------------ bottom text -------------------------
-            Text(
-              "Copyright © 2020 Smart eKYC. Designed by Hyperlogy.",
-              style: TextStyle(color: Colors.blueGrey),
-              textAlign: TextAlign.center,
-            )
-          ],
-        ),
-      ),
-    );
+                // ------------ bottom text -------------------------
+                Text(
+                  "Copyright © 2020 Smart eKYC. Designed by Hyperlogy.",
+                  style: TextStyle(color: Colors.blueGrey),
+                  textAlign: TextAlign.center,
+                )
+              ],
+            ),
+          ),
+        ));
   }
 }
