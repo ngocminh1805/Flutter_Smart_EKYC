@@ -323,7 +323,10 @@ class _FinishSceen extends State<FinishScreen> {
         setState(() {
           matchingResult = data['matchingResult'];
           compareFace = false;
+<<<<<<< HEAD:lib/features/upload-images/ekyc_finish-screen.dart
           userImage = checkUserImage(data['imageNumber']);
+=======
+>>>>>>> 21b8abc257ff9de992dd950ec83dc693991658e5:lib/features/upload-images/finish-screen.dart
         });
       }
     });
